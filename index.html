@@ -1,12 +1,11 @@
 <!DOCTYPE html>
 <head>
-     <!-- Latest compiled and minified CSS -->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
-
-    <!-- Latest compiled JavaScript -->
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
-
     <style>
+        main {
+            max-width: 920px;
+            margin: auto;
+        }
+
         #show-form-button {
             display: none;
         }
@@ -15,20 +14,14 @@
             margin: 20px;
         }
 
+        a#export {
+            text-decoration: none;
+            color: black;
+        }
+
         .form-head {
             display: flex;
             flex-direction: column;
-        }
-
-        #add-question {
-            border: 2px solid lightseagreen;
-            background-color: lightblue;
-            color: lightseagreen;
-            font-size: 20px;
-            font-weight: 600;
-            width: 60px;
-            border-radius: 8px;
-            margin-bottom: 20px;
         }
 
         #form-questions div{
@@ -45,10 +38,6 @@
         .q-is-true {
             height: 20px;
             width: 20px;
-        }
-
-        #hide-form-button {
-            margin-top: 20px;
         }
 
         #question-text {
@@ -72,23 +61,25 @@
 
 <body>
 <h1>Exam tester 3000</h1>
-<div class="container">
-
+<main>
     <form id="add-form">
+        <button type="button" id="hide-form-button" onclick="hideForm()">Hide Form</button>
+        <br/>
         <div class="form-head form-group">
-            <label>Question text</label>
-            <textarea id="question-name" rows="4"></textarea>
+            <label class="form-label">Question text</label>
+            <textarea class="form-control" id="question-name" rows="4"></textarea>
         </div>
-        <input id="add-question" type="button" value="+" onclick="addQuestion()" />
+        <input id="add-question" type="button" value="Add field" onclick="addQuestion()" />
         <div id="form-questions">
         </div>
         <input type="button" onclick="submitQuestion()" value="Save" />
-        <br/>
-        <button type="button" id="hide-form-button" onclick="hideForm()">Hide Form</button>
-        <a id="export" download="questions.json">Export</a>
+        <br>
+        <br>
+        <!-- The download url itself must be set by javascript -->
+        <button type="button"><a id="export" download="questions.json">Export</a></button>
         <div>
             <input type="button" onclick="importQuestions()" value="Import">
-            <input type="file" id="import" accept="text/csv">
+            <input type="file" id="import" accept="text/json">
         </div>
         <input type="checkbox" id="should-shuffle" checked> - Order of subquestions will be random.
     </form>
@@ -110,7 +101,7 @@
     <input type="button" onclick="nextQuestion()" value="Next question" />
     <input type="button" onclick="nextBadQuestion()" value="Next wrongly answered question" />
     <div>Wrong answers: <span id="bad-question-counter">0</span></div>
-</div>
+</main>
 
 
 
@@ -152,7 +143,7 @@ const randomIfChecked = (n) => {
 
 const importQuestions = () => {
     const file = document.getElementById("import").files[0];
-    if (file && confirm("Opravdu chcete premazat stavajici sadu otazek?")) {
+    if (file && confirm("Warning! Already existing database will be overwritten!")) {
         const reader = new FileReader();
         reader.readAsText(file, "UTF-8");
         reader.onload = (evt) => {
@@ -160,7 +151,7 @@ const importQuestions = () => {
             questions = JSON.parse(evt.target.result);
         }
         reader.onerror = (evt) => {
-            // TODO: Error
+            alert("Error when reading the file");
         }
     }
 }
@@ -216,13 +207,16 @@ const showForm = () => {
 }
 
 const nextQuestion = () => {
+    if (!questions.length) {
+        return;
+    }
     q_idx = (q_idx + 1) % questions.length;
     displayQuestion(questions[q_idx]);
 }
 
 const nextBadQuestion = () => {
     if (bad_questions.length == 0) {
-        alert("No more questions!")
+        alert("No more questions!");
     } else {
         q_idx = bad_questions.shift();
         displayQuestion(questions[q_idx]);
@@ -284,7 +278,6 @@ for (let i = 0; i < 5; ++i) {
 document.getElementById('export').href = URL.createObjectURL(new Blob([JSON.stringify(questions)]));
 
 hideForm();
-
 
 </script>
 </body>
