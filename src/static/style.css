@@ -3,6 +3,19 @@ main {
     margin: auto;
 }
 
+nav {
+    width: 100%;
+    justify-content: space-between;
+}
+
+.flex {
+    display: flex;
+}
+
+nav.right {
+    text-align: right;
+}
+
 #show-form-button {
     display: none;
 }
