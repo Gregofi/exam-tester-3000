@@ -1,116 +1,3 @@
-<!DOCTYPE html>
-<head>
-    <style>
-        main {
-            max-width: 920px;
-            margin: auto;
-        }
-
-        #show-form-button {
-            display: none;
-        }
-
-        h1 {
-            margin: 20px;
-        }
-
-        a#export {
-            text-decoration: none;
-            color: black;
-        }
-
-        .form-head {
-            display: flex;
-            flex-direction: column;
-        }
-
-        #form-questions div{
-            margin: 5px;
-            display: flex;
-            gap: 10px;
-        }
-
-        .q-text {
-            height: 30px;
-            width: 100%;
-        }
-
-        .q-is-true {
-            height: 20px;
-            width: 20px;
-        }
-
-        #question-text {
-            font-size: 20px;
-            font-weight: 500;
-        }
-
-        .test-answer input{
-            height: 20px;
-            width: 20px;
-        }
-
-        .test-answer {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-    </style>
-</head>
-
-<body>
-<h1>Exam tester 3000</h1>
-<main>
-    <form id="add-form">
-        <button type="button" id="hide-form-button" onclick="hideForm()">Hide Form</button>
-        <br/>
-        <p>
-            Here you can add new questions. Enter question text and as many subquestions as you need.
-            If you leave the text area in subquestion empty, it will be skipped. Tick the box if the
-            subquestion is true, else leave it unticked.
-        </p>
-        <div class="form-head form-group">
-            <label class="form-label">Question text</label>
-            <textarea class="form-control" id="question-name" rows="4"></textarea>
-        </div>
-        <input id="add-question" type="button" value="Add field" onclick="addQuestion()" />
-        <div id="form-questions">
-        </div>
-        <input type="button" onclick="submitQuestion()" value="Save" />
-        <br>
-        <br>
-        <!-- The download url itself must be set by javascript -->
-        <button type="button"><a id="export" download="questions.json">Export</a></button>
-        <div>
-            <input type="button" onclick="importQuestions()" value="Import">
-            <input type="file" id="import" accept="application/JSON">
-        </div>
-        <input type="checkbox" id="should-shuffle" checked> - Order of subquestions will be random.
-    </form>
-    <button type="button" id="show-form-button" onclick="showForm()">Show Form</button>
-
-    <br/>
-
-    <div id="counter">    
-    </div>
-    <form>
-        <p id="question-text">
-
-        </p>
-        <div id="poss">
-
-        </div>
-    </form>
-    <input type="button" onclick="evalQuestion()" value="Evaluate" />
-    <input type="button" onclick="nextQuestion()" value="Next question" />
-    <input type="button" onclick="nextBadQuestion()" value="Next wrongly answered question" />
-    <div>Wrong answers: <span id="bad-question-counter">0</span></div>
-</main>
-
-
-
-<script>
 let questions = JSON.parse(localStorage.getItem('questions')) ?? [];
 let bad_questions = JSON.parse(localStorage.getItem('bad_questions')) ?? [];
 
@@ -123,7 +10,7 @@ let q_idx = -1;
 /// Indicates if the subquestion should be randomly shuffled
 let shuffle = true;
 document.getElementById('should-shuffle').addEventListener('change', (e) => {
-    shuffle = e.currentTarget.checked;
+    shuffle = (e.currentTarget as HTMLInputElement).checked;
 })
 
 /// When shuffle is true it contains indexes where i-th question is now placed 
@@ -131,7 +18,7 @@ let shuffle_vector = [];
 
 /// Generates random permutation from 0 to n - 1.
 const randomPermutation = (n) => {
-    let numbers = [...Array(n).keys()];
+    let numbers = Array.from(Array(n).keys());
     numbers.sort(() => Math.random() - 0.5);
     return numbers;
 }
@@ -142,18 +29,19 @@ const randomIfChecked = (n) => {
     if (shuffle) {
         return randomPermutation(n);
     } else {
-        return [...Array(n).keys()];
+        return Array.from((n).keys());
     }
 }
 
 const importQuestions = () => {
-    const file = document.getElementById("import").files[0];
+    const input_elem = <HTMLInputElement>document.getElementById("import")
+    const file = input_elem.files[0];
     if (file && confirm("Warning! Already existing database will be overwritten!")) {
         const reader = new FileReader();
         reader.readAsText(file, "UTF-8");
         reader.onload = (evt) => {
-            localStorage.setItem('questions', evt.target.result);
-            questions = JSON.parse(evt.target.result);
+            localStorage.setItem('questions', evt.target.result.toString());
+            questions = JSON.parse(evt.target.result.toString());
         }
         reader.onerror = (evt) => {
             alert("Error when reading the file");
@@ -173,19 +61,23 @@ const addQuestion = () => {
 };
 
 const submitQuestion = () => {
-    const question_name = document.getElementById("question-name").value;
+    const input_elem = document.getElementById("question-name") as HTMLInputElement;
+    const question_name = input_elem.value;
     const subquestions = []
     let subq_div = document.getElementById('form-questions');
 
-    for (q of subq_div.querySelectorAll('.question')) {
-        const text = q.getElementsByClassName("q-text")[0].value;
+    subq_div.querySelectorAll('.question').forEach((q, key, parent) => {
+        const question_elem = q.getElementsByClassName('q-text')[0] as HTMLInputElement;
+        const text = question_elem.value;
         // Skip subquestion if text is empty
         if (!text) {
-            continue;
+            return;
         }
-        const is_true = q.getElementsByClassName("q-is-true")[0].checked;
+        const checkbox = q.getElementsByClassName('q-is-true')[0] as HTMLInputElement;
+        const is_true = checkbox.checked;
         subquestions.push({text: text, is_true: is_true});
-    }
+    })
+
     subq_div.innerHTML = '';
 
     if (subquestions.length > 0) {
@@ -260,14 +152,15 @@ const evalQuestion = () => {
     var right_answer = true;
     for (let i = 0; i < answers.length; ++i) {
         let idx = shuffle_vector[i];
+        const answer_checkbox = answers[i] as HTMLInputElement;
         // Possibly refactor into some uber cool logic without if
         // Index the html checkboxes by i, not the permutated idx.
         // Because they were already permutated when rendered.
-        const correct = answers[i].checked == ref_answers[idx];
+        const correct = answer_checkbox.checked == ref_answers[idx];
         if (!correct) {
             right_answer = false;
         }
-        answers[i].parentNode.style.color = correct ? 'green' : 'red';
+        (answers[i].parentNode as HTMLElement).style.color = correct ? 'green' : 'red';
     }
 
     if (!right_answer && !bad_questions.includes(q_idx)) {
@@ -280,9 +173,6 @@ for (let i = 0; i < 5; ++i) {
     addQuestion();
 }
 
-document.getElementById('export').href = URL.createObjectURL(new Blob([JSON.stringify(questions)]));
+(document.getElementById('export') as HTMLLinkElement).href = URL.createObjectURL(new Blob([JSON.stringify(questions)]));
 
 hideForm();
-
-</script>
-</body>

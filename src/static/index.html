@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<head>
+    <link rel="stylesheet" href="style.css"> 
+</head>
+
+<body>
+<h1>Exam tester 3000</h1>
+<main>
+    <form id="add-form">
+        <button type="button" id="hide-form-button" onclick="hideForm()">Hide Form</button>
+        <br/>
+        <p>
+            Here you can add new questions. Enter question text and as many subquestions as you need.
+            If you leave the text area in subquestion empty, it will be skipped. Tick the box if the
+            subquestion is true, else leave it unticked.
+        </p>
+        <div class="form-head form-group">
+            <label class="form-label">Question text</label>
+            <textarea class="form-control" id="question-name" rows="4"></textarea>
+        </div>
+        <input id="add-question" type="button" value="Add field" onclick="addQuestion()" />
+        <div id="form-questions">
+        </div>
+        <input type="button" onclick="submitQuestion()" value="Save" />
+        <br>
+        <br>
+        <!-- The download url itself must be set by javascript -->
+        <button type="button"><a id="export" download="questions.json">Export</a></button>
+        <div>
+            <input type="button" onclick="importQuestions()" value="Import">
+            <input type="file" id="import" accept="application/JSON">
+        </div>
+        <input type="checkbox" id="should-shuffle" checked> - Order of subquestions will be random.
+    </form>
+    <button type="button" id="show-form-button" onclick="showForm()">Show Form</button>
+
+    <br/>
+
+    <div id="counter">    
+    </div>
+    <form>
+        <p id="question-text">
+
+        </p>
+        <div id="poss">
+
+        </div>
+    </form>
+    <input type="button" onclick="evalQuestion()" value="Evaluate" />
+    <input type="button" onclick="nextQuestion()" value="Next question" />
+    <input type="button" onclick="nextBadQuestion()" value="Next wrongly answered question" />
+    <div>Wrong answers: <span id="bad-question-counter">0</span></div>
+</main>
+
+
+
+<script src="js/quizz.js"></script>
+</body>

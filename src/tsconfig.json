@@ -1,0 +1,10 @@
+{
+    "compilerOptions": {
+        "outDir": "static/js",
+        "module": "commonjs",
+        "lib": ["es2022", "dom"],
+        "removeComments": true
+        
+    },
+    "include": ["ts/**/*.ts"]
+}
