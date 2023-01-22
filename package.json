@@ -1,0 +1,6 @@
+{
+    "scripts": {
+        "build": "tsc --build src",
+        "clean": "tsc --build --clean"
+    }
+}

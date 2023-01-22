@@ -1,8 +1,9 @@
 {
     "compilerOptions": {
-        "outDir": "js/",
+        "outDir": "static/js",
         "module": "commonjs",
-        "lib": ["es2022", "dom"]
+        "lib": ["es2022", "dom"],
+        "removeComments": true
         
     },
     "include": ["ts/**/*.ts"]
