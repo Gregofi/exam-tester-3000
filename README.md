@@ -14,6 +14,9 @@ The tester is hosted [here](https://gregofi.github.io/exam-tester-3000/).
 
 All questions are stored locally in `localStorage`. Be careful when deleting data in the browser, because that might take the questions with it.
 
+## Build
+If you want to run this app localy then just run `npm run install` and open `static/index.html` in your favorite web browser.
+
 ## Design note
 This app was something i needed for certain exam, it was also created day and a half before it, and time was a factor.
 That's why it looks the way it looks (both on inside and outside).
