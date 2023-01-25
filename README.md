@@ -17,6 +17,8 @@ All questions are stored locally in `localStorage`. Be careful when deleting dat
 ## Build
 If you want to run this app localy then just run `npm run install` and open `static/index.html` in your favorite web browser.
 
+Alternatively check the `gh-pages` branch, which contains latest deployed version.
+
 ## Design note
 This app was something i needed for certain exam, it was also created day and a half before it, and time was a factor.
 That's why it looks the way it looks (both on inside and outside).
